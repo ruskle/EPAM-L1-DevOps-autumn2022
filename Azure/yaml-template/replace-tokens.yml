@@ -1,0 +1,34 @@
+# replace token template
+---
+parameters:
+- name: targetFiles
+  type: string
+  default: 'default.tfvars, backend.tf' 
+- name: tokenPrefix
+  type: string
+  default: '#{'
+- name: tokenSufix
+  type: string
+  default: '}'
+- name: rootDirectory
+  type: string
+  default: '$(System.DefaultWorkingDirectory)/variables'
+
+steps:
+  - task: replacetokens@5
+    displayName: 'Replace Token'
+    inputs:
+      rootDirectory: '${{ parameters.rootDirectory }}'
+      targetFiles: '${{ parameters.targetFiles }}'
+      encoding: 'auto'
+      tokenPattern: 'custom'
+      tokenPrefix: '${{ parameters.tokenPrefix }}'
+      tokenSuffix: '${{ parameters.tokenSufix }}'
+      writeBOM: true
+      actionOnMissing: 'warn'
+      keepToken: false
+      actionOnNoFiles: 'continue'
+      enableTransforms: false
+      enableRecursion: false
+      useLegacyPattern: false
+      enableTelemetry: true

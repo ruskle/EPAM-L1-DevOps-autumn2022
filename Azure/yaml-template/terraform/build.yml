@@ -1,0 +1,30 @@
+---
+parameters:
+- name: artifact_name
+  type: string
+  default: 'terraform'
+- name: feed_name
+  type: string
+  default: 'Ruslan/edu-klv'
+- name: project
+  type: string
+  default: 'project1'
+- name: env
+  type: string
+  default: 'dev'
+- name: package_version
+  type: string
+  default: '1.0.*'
+
+
+steps:
+  - task: UniversalPackages@0
+    displayName: 'terraform-deploy-on-${{ parameters.project }}-${{ parameters.env }}'
+    inputs:
+      command: publish
+      vstsPackageVersion: 1.0.0
+      publishDirectory: '$(System.DefaultWorkingDirectory)'
+      vstsFeedPublish: ${{ parameters.feed_name }}
+      vstsFeedPackagePublish: ${{ parameters.artifact_name }}
+      versionOption: 'custom'
+      versionPublish: ${{ parameters.package_version }}

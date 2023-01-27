@@ -1,0 +1,58 @@
+# Define pipeline parameters
+parameters:
+  - name: agentPoolImage
+    type: string
+    default: 'windows-latest'
+    values:
+      - 'windows-latest'
+      - 'ubuntu-latest'
+      - 'windows-2022'
+      - 'ubuntu-22.04'
+  - name: env
+    type: string
+    default: 'dev'
+    values:
+      - 'dev'
+      - 'qa'
+      - 'uat'
+      - 'prd'
+  - name: package_version
+    type: string
+    default: "1.0.*"
+
+# local variables 
+variables:
+- name: artifact_name
+  value: 'terraform'
+- name: project
+  value: 'project1'
+- name: feed_name
+  value: 'Project1/edu-klv'
+
+trigger: 
+  - main
+
+# Add template repository
+resources:
+ repositories:
+   - repository: templates
+     type: git
+     name: Project1/yaml-template
+
+# Create pipeline stages
+stages:
+  - stage: release
+    displayName: Release
+    pool:
+      vmImage: ${{ parameters.agentPoolImage }}
+    jobs:
+    - job: build
+      displayName: build
+      steps:
+      - template: terraform/build.yml@templates
+        parameters:
+          artifact_name: ${{ variables.artifact_name }}
+          feed_name: ${{ variables.feed_name }}
+          project: ${{ variables.project }}
+          env: ${{ parameters.env }}
+          package_version: '${{ parameters.package_version }}'

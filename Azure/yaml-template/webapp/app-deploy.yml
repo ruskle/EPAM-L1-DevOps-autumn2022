@@ -1,0 +1,29 @@
+---
+parameters:
+- name: vstsFeed
+  type: string
+  default: 'Project1/edu-klv'
+- name: vstsFeedPackage
+  type: string
+  default: 'app'
+- name: vstsPackageVersion
+  type: string
+  default: '1.0.*'  
+
+steps:
+  - task: UniversalPackages@0
+    displayName: 'Universal package download'
+    inputs:
+      command: 'download'
+      downloadDirectory: '$(System.DefaultWorkingDirectory)'
+      feedsToUse: 'internal'
+      vstsFeed: '${{ parameters.vstsFeed }}'
+      vstsFeedPackage: '${{ parameters.vstsFeedPackage }}'
+      vstsPackageVersion: '${{ parameters.vstsPackageVersion }}'
+  - task: AzureRmWebAppDeployment@4
+    displayName: 'Azure App Service Deploy: webapp01-edu-klv-dev-westeurope'
+    inputs:
+      azureSubscription: 'Azure subscription 1 (3b789e5a-d874-493c-926e-c49708d38c82)'
+      WebAppName: 'webapp01-edu-klv-dev-westeurope'
+      packageForLinux: '$(System.DefaultWorkingDirectory)'
+      

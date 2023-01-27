@@ -1,0 +1,40 @@
+# Define pipeline parameters
+parameters:
+    # Universal Package parameters
+  - name: vstsFeed
+    type: string
+    default: 'Project1/edu-klv'
+  - name: vstsFeedPackage
+    type: string
+    default: 'app'
+  - name: vstsPackageVersion
+    type: string
+    default: '1.0.*'
+
+
+# Add template repository
+resources:
+ repositories:
+   - repository: templates
+     type: git
+     name: Project1/yaml-template
+
+# trigger: 
+#   - main
+
+
+jobs:
+- job: deploy
+  displayName: 'webapp deploy'
+  pool: 
+    vmImage: 'windows-latest' 
+  steps:
+  - template: webapp/app-deploy.yml@templates
+    parameters:
+      vstsFeed: '${{ parameters.vstsFeed }}'
+      vstsFeedPackage: '${{ parameters.vstsFeedPackage }}'
+      vstsPackageVersion: '${{ parameters.vstsPackageVersion }}'
+
+
+
+

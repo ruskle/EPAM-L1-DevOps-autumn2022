@@ -1,0 +1,72 @@
+---
+parameters:
+- name: targetFiles
+  type: string
+  default: 'default.tfvars, backend.tf' 
+- name: tokenPrefix
+  type: string
+  default: '#{'
+- name: tokenSufix
+  type: string
+  default: '}'
+- name: rootDirectory
+  type: string
+  default: '$(System.DefaultWorkingDirectory)/variables'
+- name: default_var
+  type: string 
+  default: "$(System.DefaultWorkingDirectory)/variables/default.tfvars"
+- name: backend_var
+  type: string 
+  default: "$(System.DefaultWorkingDirectory)/variables/backend.tf"
+- name: argument_deploy
+  type: string
+  default: 'apply'  
+- name: displayName
+  type: string
+  default: 'init'  
+
+steps:
+- task: replacetokens@5
+  displayName: 'Replace Token'
+  inputs:
+    rootDirectory: '${{ parameters.rootDirectory }}'
+    targetFiles: '${{ parameters.targetFiles }}'
+    encoding: 'auto'
+    tokenPattern: 'custom'
+    tokenPrefix: '${{ parameters.tokenPrefix }}'
+    tokenSuffix: '${{ parameters.tokenSufix }}'
+    writeBOM: true
+    actionOnMissing: 'warn'
+    keepToken: false
+    actionOnNoFiles: 'continue'
+    enableTransforms: false
+    enableRecursion: false
+    useLegacyPattern: false
+    enableTelemetry: true
+- task: Terraform@2
+  displayName: 'Terraform init'
+  inputs:
+    TemplatePath: '$(System.DefaultWorkingDirectory)/'
+    Arguments: 'init -var-file "${{ parameters.default_var }}" -backend-config "${{ parameters.backend_var }}"'
+    InstallTerraform: true
+    UseAzureSub: true
+    ConnectedServiceNameSelector: 'ConnectedServiceNameARM'
+    ConnectedServiceNameARM: 'test-pr1-conn'
+    ManageState: false
+- task: Terraform@2
+  displayName: 'Terraform ${{ parameters.displayName }}'
+  inputs:
+    TemplatePath: '$(System.DefaultWorkingDirectory)/'
+    ${{ if eq(parameters.displayName, 'plan') }}:
+      Arguments: '"${{ parameters.displayName }}" -var-file "${{ parameters.default_var }}"'
+    ${{ else }}:
+      Arguments: '"${{ parameters.displayName }}" -var-file "${{ parameters.default_var }}" -auto-approve'
+    InstallTerraform: true
+    UseAzureSub: true
+    ConnectedServiceNameSelector: 'ConnectedServiceNameARM'
+    ConnectedServiceNameARM: 'test-pr1-conn'
+    ManageState: false
+
+  
+
+    

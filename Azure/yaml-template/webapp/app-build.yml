@@ -1,0 +1,41 @@
+---
+parameters:
+- name: artifact_name
+  type: string
+  default: 'terraform'
+- name: feed_name
+  type: string
+  default: 'Ruslan/edu-klv'
+- name: project
+  type: string
+  default: 'project1'
+- name: env
+  type: string
+  default: 'dev'
+- name: version_option
+  type: string
+  default: 'patch'
+- name: package_version
+  type: string
+  default: '0.0.*'  
+
+
+steps:
+  - task: DotNetCoreCLI@2
+    displayName: 'dotnet publish'
+    inputs:
+      command: publish
+      arguments: ' --output $(Build.ArtifactStagingDirectory)'
+      zipAfterPublish: false
+      modifyOutputPath: false
+
+  - task: UniversalPackages@0
+    displayName: 'app-deploy-on-${{ parameters.project }}-${{ parameters.env }}'
+    inputs:
+      command: publish
+      vstsPackageVersion: ${{ parameters.package_version }}
+      publishDirectory: '$(Build.ArtifactStagingDirectory)'
+      vstsFeedPublish: ${{ parameters.feed_name }}
+      vstsFeedPackagePublish: ${{ parameters.artifact_name }}
+      versionOption: ${{ parameters.version_option }}
+      

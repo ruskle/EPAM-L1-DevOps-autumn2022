@@ -1,0 +1,21 @@
+# terraform template
+---
+parameters:
+- name: arguments
+  type: string 
+  default: 'init -var-file "$(System.DefaultWorkingDirectory)/variables/default.tfvars" -backend-config "$(System.DefaultWorkingDirectory)/variables/backend.tf"'
+- name: displayName
+  type: string
+  default: 'init'
+
+steps:
+  - task: Terraform@2
+    displayName: 'Terraform ${{ parameters.displayName }}'
+    inputs:
+      TemplatePath: '$(System.DefaultWorkingDirectory)/'
+      Arguments: '${{ parameters.arguments }}'
+      InstallTerraform: true
+      UseAzureSub: true
+      ConnectedServiceNameSelector: 'ConnectedServiceNameARM'
+      ConnectedServiceNameARM: 'test-pr1-conn'
+      ManageState: false

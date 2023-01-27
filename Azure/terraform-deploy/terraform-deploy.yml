@@ -1,0 +1,94 @@
+# Define pipeline parameters
+parameters:
+  - name: vstsPackageVersion
+    type: string
+    default: '0.0.*'
+  - name: argument_deploy
+    type: string
+    default: 'apply'
+    values:
+      - 'apply'
+      - 'destroy'
+
+variables:
+  - name: tokenPrefix
+    value: '#{'
+  - name: tokenSufix
+    value: '}' 
+  - name: vstsFeed
+    value: 'Project1/edu-klv'
+  - name: vstsFeedPackage
+    value: 'terraform'
+  - name: targetFiles
+    value: 'default.tfvars, backend.tf'
+  - name: rootDirectory
+    value: '$(System.DefaultWorkingDirectory)/variables'
+  - name: default_variables
+    value: "$(System.DefaultWorkingDirectory)/variables/default.tfvars"
+  - name: backend_variables
+    value: "$(System.DefaultWorkingDirectory)/variables/backend.tf"
+
+# Add template repository
+resources:
+ repositories:
+   - repository: templates
+     type: git
+     name: Project1/yaml-template
+
+trigger: 
+  - main
+
+jobs:
+- job: deployplan
+  displayName: deploy plan
+  pool: 
+    vmImage: 'windows-latest' 
+  steps:
+  - template: universal-package-download.yml@templates
+    parameters:
+      vstsFeed: '${{ variables.vstsFeed }}'
+      vstsFeedPackage: '${{ variables.vstsFeedPackage }}'
+      vstsPackageVersion: '${{ parameters.vstsPackageVersion }}'
+  - template: terraform/deploy.yml@templates
+    parameters:
+      rootDirectory: '${{ variables.rootDirectory }}'
+      targetFiles: '${{ variables.targetFiles }}'
+      tokenPrefix: '${{ variables.tokenPrefix }}'
+      tokenSufix: '${{ variables.tokenSufix }}'
+      default_var: '${{ variables.default_variables }}'
+      backend_var: '${{ variables.backend_variables }}'
+      argument_deploy: '${{ parameters.argument_deploy }}'
+      displayName: 'plan'
+
+- job: agentlessjob
+  dependsOn: deployplan
+  pool: server
+  steps:
+  - task: ManualValidation@0
+    displayName: 'Manual Validation for terraform "${{ parameters.argument_deploy }}"'
+    timeoutInMinutes: 15
+
+- job: deploy
+  displayName: '${{ parameters.argument_deploy }}'
+  dependsOn: agentlessjob
+  pool: 
+    vmImage: 'windows-latest' 
+  steps:
+  - template: universal-package-download.yml@templates
+    parameters:
+      vstsFeed: '${{ variables.vstsFeed }}'
+      vstsFeedPackage: '${{ variables.vstsFeedPackage }}'
+      vstsPackageVersion: '${{ parameters.vstsPackageVersion }}'
+  - template: terraform/deploy.yml@templates
+    parameters:
+      rootDirectory: '${{ variables.rootDirectory }}'
+      targetFiles: '${{ variables.targetFiles }}'
+      tokenPrefix: '${{ variables.tokenPrefix }}'
+      tokenSufix: '${{ variables.tokenSufix }}'
+      default_var: '${{ variables.default_variables }}'
+      backend_var: '${{ variables.backend_variables }}'
+      argument_deploy: '${{ parameters.argument_deploy }}'
+      displayName: '${{ parameters.argument_deploy }}'
+
+
+

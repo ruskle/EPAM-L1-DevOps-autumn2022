@@ -1,0 +1,23 @@
+# universal package download template
+---
+parameters:
+- name: vstsFeed
+  type: string
+  default: 'Project1/edu-klv'
+- name: vstsFeedPackage
+  type: string
+  default: 'terraform'
+- name: vstsPackageVersion
+  type: string
+  default: '0.0.1'  
+
+steps:
+  - task: UniversalPackages@0
+    displayName: 'Universal package download'
+    inputs:
+      command: 'download'
+      downloadDirectory: '$(System.DefaultWorkingDirectory)'
+      feedsToUse: 'internal'
+      vstsFeed: '${{ parameters.vstsFeed }}'
+      vstsFeedPackage: '${{ parameters.vstsFeedPackage }}'
+      vstsPackageVersion: '${{ parameters.vstsPackageVersion }}'
