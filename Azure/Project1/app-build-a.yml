@@ -1,0 +1,63 @@
+# Define pipeline parameters
+parameters:
+  - name: agentPoolImage
+    type: string
+    default: 'windows-latest'
+    values:
+      - 'windows-latest'
+      - 'ubuntu-latest'
+      - 'windows-2022'
+      - 'ubuntu-22.04'
+  - name: env
+    type: string
+    default: 'dev'
+    values:
+      - 'dev'
+      - 'qa'
+      - 'uat'
+      - 'prd'
+  - name: project
+    type: string
+    default: 'project1'
+  - name: feed_name
+    default: 'Project1/edu-klv'
+  - name: version_option
+    type: string
+    default: 'patch'
+    values:
+      - 'major'
+      - 'minor'
+      - 'patch'
+
+# local variables 
+variables:
+- name: artifact_name
+  value: 'app'
+
+trigger: 
+  - main
+
+# Add template repository
+resources:
+ repositories:
+   - repository: templates
+     type: git
+     name: Project1/yaml-template
+
+# Create pipeline stages
+stages:
+  - stage: release
+    displayName: Release
+    pool:
+      vmImage: ${{ parameters.agentPoolImage }}
+    jobs:
+    - job: build
+      displayName: build
+      steps:
+      - template: webapp/app-build.yml@templates
+        parameters:
+          artifact_name: ${{ variables.artifact_name }}
+          feed_name: ${{ parameters.feed_name }}
+          project: ${{ parameters.project }}
+          env: ${{ parameters.env }}
+          version_option: ${{ parameters.version_option }}
