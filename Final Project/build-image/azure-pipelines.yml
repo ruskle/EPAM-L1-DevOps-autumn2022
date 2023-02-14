@@ -1,0 +1,36 @@
+---
+trigger:
+  - main
+resources:
+  - repo: self
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  image_definition: 'ubuntu-20.04-build-agent'
+
+stages:
+  - stage: bake
+    displayName: Bake Azure DevOPs self-hosted Build Agent VM Image
+    jobs:
+      - job: build
+        workspace:
+          clean: all
+        timeoutInMinutes: "120"
+        steps:
+          - task: AzureImageBuilderTask@1
+            inputs:
+              managedIdentity: '/subscriptions/3b789e5a-d874-493c-926e-c49708d38c82/resourcegroups/rg-epam-com-westeurope/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-epam-com-westurope'
+              imageSource: 'marketplace'
+              baseImage: 'Canonical:0001-com-ubuntu-server-focal:20_04-lts'
+              packagePath: 'bake'
+              inlineScript: 'ls && cd /tmp/bake && ls && chmod -R 755 /tmp/bake/** && ./bake.sh'
+              storageAccountName: 'sabakeepamcomwesteurope'
+              distributeType: 'sig'
+              galleryImageId: '/subscriptions/3b789e5a-d874-493c-926e-c49708d38c82/resourceGroups/rg-epam-com-westeurope/providers/Microsoft.Compute/galleries/gal_epam_com_westeurope/images/$(image_definition)'
+              replicationRegions: 'westeurope'
+              ibSubscription: 'sc-epam-final-project'
+              ibAzureResourceGroup: 'rg-epam-com-westeurope'
+              ibLocation: 'westeurope'
+            displayName: 'Build Azure DevOps self-hosted VM image'

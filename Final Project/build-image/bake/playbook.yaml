@@ -1,0 +1,67 @@
+- hosts: localhost
+  connection: local
+  gather_facts: true
+  roles:
+    - role: lean_delivery.msft
+      msft_package:
+        - powershell
+        - azure-cli
+    - role: lean_delivery.hashicorp
+      hashicorp_package:
+        - terraform
+  post_tasks:
+    - name: Update all packages to their latest version
+      apt:
+        name: "*"
+        state: latest
+      become: yes
+    - name: Install packages
+      package:
+        name:
+          - python3-pip
+          - openjdk-17-jdk
+          - maven
+          - zip
+          - unzip
+        state: present
+      become: yes
+    - name: Remove packages
+      package:
+        name:
+          - openjdk-11-jre-headless
+        state: absent
+      become: yes
+    - name: Install pip packages
+      pip:
+        name:
+          - pip
+          - ansible
+        state: latest
+      become: yes 
+    - name: Update System-wide environment variables
+      template:
+        src: environment.j2
+        dest: /etc/environment
+        owner: root
+        group: root
+        mode: "0644"
+      become: yes
+    - name: delete old maven
+      shell:
+        rm -R -f  /usr/share/maven/**
+      become: yes
+    - name: Download Apache Maven
+      become: yes
+      get_url: 
+        url: https://dlcdn.apache.org/maven/maven-3/3.9.0/binaries/apache-maven-3.9.0-bin.tar.gz
+        dest: /tmp
+    - name: Untar Maven
+      shell:
+        chdir=/tmp tar -zxf apache-maven-3.9.0-bin.tar.gz
+      become: yes
+    - name: copy maven
+      shell:
+        chdir=/tmp/apache-maven-3.9.0 cp -R * /usr/share/maven
+      become: yes  
+
+

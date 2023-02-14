@@ -1,0 +1,25 @@
+---
+parameters:
+- name: app_name
+  type: string
+- name: azureSubscription
+  type: string
+  default: 'sc-epam-final-project'
+- name: packageForLinux
+  type: string
+  default: '$(System.DefaultWorkingDirectory)/spring-petclinic-3.0.0-SNAPSHOT.jar'
+- name: startUpCommand
+  type: string
+  default: 'java -jar /home/site/wwwroot/spring-petclinic-3.0.0-SNAPSHOT.jar'
+  
+
+steps:
+- task: AzureRmWebAppDeployment@4
+  displayName: 'Azure Web App Deploy:'
+  inputs:
+    azureSubscription: ${{ parameters.azureSubscription }}
+    appType: webAppLinux
+    WebAppName: ${{ parameters.app_name }}
+    packageForLinux: ${{ parameters.packageForLinux }}
+    runtimeStack: 'JAVA|17-java17'
+    startUpCommand: ${{ parameters.startUpCommand }}

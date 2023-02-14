@@ -1,0 +1,26 @@
+# universal package download template
+---
+parameters:
+- name: vstsFeed
+  type: string
+  default: 'Epam-final-project/final-project'
+- name: artifact_name
+  type: string
+- name: targetdir
+  type: string
+  default: '$(System.DefaultWorkingDirectory)'
+- name: artifact_version
+  type: string
+  default: '*'  
+
+steps:
+  - task: UniversalPackages@0
+    displayName: 'Universal package download'
+    inputs:
+      command: 'download'
+      downloadDirectory: ${{ parameters.targetdir }}
+      feedsToUse: 'internal'
+      vstsFeed: '${{ parameters.vstsFeed }}'
+      vstsFeedPackage: '${{ parameters.artifact_name }}'
+      vstsPackageVersion: '${{ parameters.artifact_version }}'
+      

@@ -1,0 +1,8 @@
+jobs:
+  - job: agentlessjob
+    dependsOn: release
+    pool: server
+    steps:
+    - task: ManualValidation@0
+      displayName: 'Manual Validation for terraform plan"'
+      timeoutInMinutes: 15

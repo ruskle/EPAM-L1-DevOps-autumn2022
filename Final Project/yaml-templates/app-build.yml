@@ -1,0 +1,21 @@
+---
+parameters:
+- name: artifact_version
+  type: string
+  default: $(major).$(minor).$(patch)
+- name: publish_directory
+  type: string
+  default: 'target/spring-petclinic-3.0.0-SNAPSHOT.jar'
+- name: artifact_name
+  type: string
+  default: 'petclinic'
+
+
+steps:
+- template: java/maven.yml@templates
+- template: artifacts/upload.yml@templates
+  parameters:
+    artifact_version: ${{ parameters.artifact_version }}
+    publish_directory: ${{ parameters.publish_directory }}
+    artifact_name: ${{ parameters.artifact_name }}
+    

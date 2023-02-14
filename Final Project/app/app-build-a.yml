@@ -1,0 +1,46 @@
+---
+name: $(major).$(minor).$(patch)-$(Build.SourceBranch)
+# Define pipeline parameters
+parameters:
+  - name: agentPoolImage
+    type: string
+    default: 'ubuntu-latest'
+    values:
+      - 'windows-latest'
+      - 'ubuntu-latest'
+      - 'windows-2022'
+      - 'ubuntu-22.04'
+
+# local variables 
+variables:
+- name: artifact_name
+  value: 'app'
+- name: major
+  value: 1
+- name: minor   
+  value: 1
+- name: patch
+  value: $[counter(variables['minor'],1)]
+
+trigger: 
+  - main
+
+# Add template repository
+resources:
+  repositories:
+    - repository: templates
+      type: git
+      name: Epam-final-project/yaml-templates
+      ref: artifact_task_change
+
+# Create pipeline stages
+stages:
+  - stage: release
+    displayName: Release
+    pool:
+      vmImage: ${{ parameters.agentPoolImage }}
+    jobs:
+    - job: build
+      displayName: build
+      steps:
+      - template: app-build.yml@templates

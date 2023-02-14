@@ -1,0 +1,50 @@
+---
+parameters:
+- name: jdk_version
+  type: string
+  default: '1.17'
+- name: goals
+  type: string
+  default: 'package'
+- name: pom_file
+  type: string
+  default: 'pom.xml'
+- name: testResultsFiles
+  type: string
+  default: '**/surefire-reports/TEST-*.xml'
+- name: publishJUnitResults
+  type: boolean
+  default: true
+- name: mavenOptions
+  type: string
+  default: '-Xmx3072m'
+- name: javaHomeOption
+  type: string
+  default: 'JDKVersion'
+- name: mavenDirectory
+  type: string
+  default: '/opt/maven'
+- name: mavenVersionOption
+  type: string
+  default: 'path'
+- name: mavenSetM2Home
+  type: boolean
+  default: true
+
+
+steps:
+- task: Maven@4
+  displayName: 'Maven pom.xml'
+  inputs:
+    mavenPomFile: ${{ parameters.pom_file }}
+    mavenOptions: ${{ parameters.mavenOptions }}
+    javaHomeOption: ${{ parameters.javaHomeOption }}
+    jdkVersionOption: ${{ parameters.jdk_version }}
+    mavenVersionOption: ${{ parameters.mavenVersionOption }}
+    mavenDirectory: ${{ parameters.mavenDirectory }}
+    mavenSetM2Home: ${{ parameters.mavenSetM2Home }}
+    jdkArchitectureOption: 'x64'
+    mavenAuthenticateFeed: false
+    publishJUnitResults: ${{ parameters.publishJUnitResults }}
+    testResultsFiles: ${{ parameters.testResultsFiles }}
+    goals: ${{ parameters.goals }}

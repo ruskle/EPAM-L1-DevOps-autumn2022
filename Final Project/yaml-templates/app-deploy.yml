@@ -1,0 +1,34 @@
+parameters:
+  - name: artifact_version
+    default: "*"
+  - name: artifact_name
+    type: string
+  - name: targetFiles
+    type: string
+    default: '**' 
+  - name: env
+    type: string
+  - name: location
+    type: string
+    default: 'westeurope'
+    
+stages:
+  - stage: release
+    displayName: app deploy
+    pool: "vmss-test-pool"
+    jobs:
+    - job: release
+      displayName: 'web app deploy'
+      steps:
+      - template: artifacts/download.yml@templates
+        parameters:
+          artifact_version: ${{ parameters.artifact_version }}
+          artifact_name: ${{ parameters.artifact_name }}
+
+      - template: web-app-deploy.yml@templates
+        parameters:
+          app_name: 'as-epam-${{ parameters.env }}-${{ parameters.location }}'
+          
+
+
+      

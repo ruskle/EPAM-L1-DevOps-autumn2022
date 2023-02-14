@@ -1,0 +1,1 @@
+yaml-pipeline for deploy infrastructure to azure

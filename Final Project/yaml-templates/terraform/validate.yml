@@ -1,0 +1,25 @@
+---
+
+steps:
+- task: Terraform@2
+  displayName: "terraform init"
+  inputs:
+    TemplatePath: '$(Build.SourcesDirectory)/'
+    Arguments: 'init -backend=false'
+    InstallTerraform: true
+    UseAzureSub: true
+    ConnectedServiceNameSelector: 'ConnectedServiceNameARM'
+    ConnectedServiceNameARM: 'sc-epam-final-project'
+    ManageState: false
+
+- task: Terraform@2
+  displayName: "terraform validate"
+  inputs:
+    TemplatePath: '$(Build.SourcesDirectory)/'
+    Arguments: 'validate'
+    InstallTerraform: true
+    UseAzureSub: true
+    ConnectedServiceNameSelector: 'ConnectedServiceNameARM'
+    ConnectedServiceNameARM: 'sc-epam-final-project'
+    ManageState: false
+    

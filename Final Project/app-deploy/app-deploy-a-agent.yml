@@ -1,0 +1,33 @@
+name: "app deploy"
+# Define pipeline parameters
+parameters:
+- name: artifact_version
+  default: "*"
+- name: env
+  type: string
+  default: 'dev'
+  values:
+    - 'dev'
+    - 'qa'
+    - 'prd'
+
+variables:
+- name: artifact_name
+  value: 'petclinic'
+
+# Add template repository
+resources:
+ repositories:
+   - repository: templates
+     type: git
+     name: Epam-final-project/yaml-templates
+
+# Create pipeline stages
+stages:
+- template: app-deploy.yml@templates
+  parameters:
+    artifact_version: ${{ parameters.artifact_version }}
+    artifact_name: ${{ variables.artifact_name }}
+    env: ${{ parameters.env }}
+
+

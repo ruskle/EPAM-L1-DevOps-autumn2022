@@ -1,0 +1,55 @@
+parameters:
+  - name: artifact_version
+    default: "*"
+  - name: target
+    type: string
+    default: 'apply'
+    values:
+      - 'apply'
+      - 'destroy'
+  - name: artifact_name
+    type: string
+  - name: targetFiles
+    type: string
+    default: '**'
+
+stages:
+  - stage: release
+    displayName: Release
+    pool:
+      vmImage: 'windows-latest'
+    jobs:
+    - job: release #terraform init, plan or plan-destroy job
+      displayName: 'plan ${{ parameters.target }}'
+      steps:
+      - template: artifacts/download.yml@templates
+        parameters:
+          artifact_version: ${{ parameters.artifact_version }}
+          artifact_name: ${{ parameters.artifact_name }}
+      - template: replace-tokens.yml@templates
+        parameters:
+          targetFiles: ${{ parameters.targetFiles }}
+          rootDirectory: '$(System.DefaultWorkingDirectory)/variables'
+      - ${{ if eq(parameters.target, 'apply') }}:
+        - template: terraform/plan.yml@templates
+      - ${{ if eq(parameters.target, 'destroy') }}:
+        - template: terraform/plan-destroy.yml@templates
+
+    - template: manual-validation.yml@templates #manual validation job
+
+    - job: deploy  #terraform init, apply or destroy job
+      dependsOn: agentlessjob
+      displayName: ${{ parameters.target }}
+      steps:
+      - template: artifacts/download.yml@templates
+        parameters:
+          artifact_version: ${{ parameters.artifact_version }}
+          artifact_name: ${{ parameters.artifact_name }}
+      - template: replace-tokens.yml@templates
+        parameters:
+          targetFiles: ${{ parameters.targetFiles }}
+          rootDirectory: '$(System.DefaultWorkingDirectory)/variables'
+      - ${{ if eq(parameters.target, 'apply') }}:
+        - template: terraform/apply.yml@templates
+      - ${{ if eq(parameters.target, 'destroy') }}:
+        - template: terraform/destroy.yml@templates

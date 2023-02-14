@@ -1,0 +1,8 @@
+---
+# defaults
+
+msft_package: []
+
+msft_packages_additional: []
+
+add_azure_cli_repo: true

@@ -1,0 +1,32 @@
+---
+parameters:
+- name: default_var
+  type: string 
+  default: "$(System.DefaultWorkingDirectory)/variables/default.tfvars"
+- name: backend_var
+  type: string 
+  default: "$(System.DefaultWorkingDirectory)/variables/backend.tf"
+
+steps:
+- task: Terraform@2
+  displayName: 'Terraform init'
+  inputs:
+    TemplatePath: '$(System.DefaultWorkingDirectory)/'
+    Arguments: 'init -var-file "${{ parameters.default_var }}" -backend-config "${{ parameters.backend_var }}"'
+    InstallTerraform: true
+    UseAzureSub: true
+    ConnectedServiceNameSelector: 'ConnectedServiceNameARM'
+    ConnectedServiceNameARM: 'sc-epam-final-project'
+    ManageState: false
+
+- task: Terraform@2
+  displayName: 'Terraform plan'
+  inputs:
+    TemplatePath: '$(System.DefaultWorkingDirectory)/'
+    Arguments: 'plan -var-file "${{ parameters.default_var }}"'
+    InstallTerraform: true
+    UseAzureSub: true
+    ConnectedServiceNameSelector: 'ConnectedServiceNameARM'
+    ConnectedServiceNameARM: 'sc-epam-final-project'
+    ManageState: false
+

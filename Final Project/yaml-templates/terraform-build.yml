@@ -1,0 +1,16 @@
+---
+parameters:
+  - name: artifact_version
+    type: string
+    default: $(major).$(minor).$(patch)
+  - name: Connected_Service_NameARM
+    type: string
+    default: "sc-epam-final-project"
+
+steps:
+- template: terraform/validate.yml@templates
+  parameters:
+    Connected_Service_NameARM: ${{ parameters.Connected_Service_NameARM }}
+- template: artifacts/upload.yml@templates
+  parameters:
+    artifact_version: ${{ parameters.artifact_version }}

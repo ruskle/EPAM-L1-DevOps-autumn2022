@@ -1,0 +1,34 @@
+---
+- name: Become block
+  block:
+    - name: Install required packages
+      apt:
+        name: '{{ msft_packages_base | union(msft_packages_additional) | unique }}'
+        state: present
+        update_cache: true
+      register: installed_package
+      until: installed_package is succeeded
+
+    - name: Install repository defenition from the internet
+      apt:
+        deb: '{{ msft_repo_deb_url }}'
+      register: package_install
+      until: package_install is succeeded
+
+    - name: Add universe repository
+      apt_repository:
+        repo: '{{ universe_repo_default }}'
+        validate_certs: true
+
+    - name: Add Azure CLI repo
+      template:
+        src: azure-cli.list.j2
+        dest: /etc/apt/sources.list.d/azure-cli.list
+        owner: root
+        group: root
+        mode: '0644'
+      when: add_azure_cli_repo
+    - name: Update cache
+      apt:
+        update_cache: yes
+  become: true

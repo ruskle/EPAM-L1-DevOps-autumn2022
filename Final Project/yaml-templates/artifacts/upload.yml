@@ -1,0 +1,26 @@
+---
+parameters:
+- name: artifact_name
+  type: string
+  default: '$(Build.Repository.Name)'
+- name: feed_name
+  type: string
+  default: 'Epam-final-project/final-project'
+- name: artifact_version
+  type: string
+- name: publish_directory
+  type: string
+  default: '$(System.DefaultWorkingDirectory)'
+
+
+steps:
+  - task: UniversalPackages@0
+    displayName: 'artifact upload'
+    inputs:
+      command: publish
+      publishDirectory: ${{ parameters.publish_directory }}
+      vstsFeedPublish: ${{ parameters.feed_name }}
+      vstsFeedPackagePublish: ${{ parameters.artifact_name }}
+      versionOption: 'custom'
+      versionPublish: ${{ parameters.artifact_version }}
+      

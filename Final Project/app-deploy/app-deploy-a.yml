@@ -1,0 +1,42 @@
+name: "app deploy"
+# Define pipeline parameters
+parameters:
+- name: agentPoolImage
+  type: string
+  default: 'ubuntu-latest'
+  values:
+    - 'windows-latest'
+    - 'ubuntu-latest'
+    - 'windows-2022'
+    - 'ubuntu-22.04'
+- name: artifact_version
+  default: "*"
+- name: env
+  type: string
+  default: 'dev'
+  values:
+    - 'dev'
+    - 'qa'
+    - 'prd'
+
+variables:
+- name: artifact_name
+  value: 'petclinic'
+
+# Add template repository
+resources:
+ repositories:
+   - repository: templates
+     type: git
+     name: Epam-final-project/yaml-templates
+     ref: artifact_task_change
+
+# Create pipeline stages
+stages:
+- template: app-deploy.yml@templates
+  parameters:
+    artifact_version: ${{ parameters.artifact_version }}
+    artifact_name: ${{ variables.artifact_name }}
+    env: ${{ parameters.env }}
+
+
