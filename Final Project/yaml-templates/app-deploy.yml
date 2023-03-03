@@ -15,7 +15,7 @@ parameters:
 stages:
   - stage: release
     displayName: app deploy
-    pool: "vmss-test-pool"
+    pool: "vmss-epam-dev-westeurope-pool"
     jobs:
     - job: release
       displayName: 'web app deploy'

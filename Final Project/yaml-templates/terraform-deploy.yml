@@ -12,9 +12,13 @@ parameters:
   - name: targetFiles
     type: string
     default: '**'
+  - name: environment
+    type: string
 
 stages:
   - stage: release
+    variables:
+    - group: ${{ parameters.environment }}
     displayName: Release
     pool:
       vmImage: 'windows-latest'
@@ -34,7 +38,7 @@ stages:
         - template: terraform/plan.yml@templates
       - ${{ if eq(parameters.target, 'destroy') }}:
         - template: terraform/plan-destroy.yml@templates
-
+        
     - template: manual-validation.yml@templates #manual validation job
 
     - job: deploy  #terraform init, apply or destroy job
@@ -53,3 +57,4 @@ stages:
         - template: terraform/apply.yml@templates
       - ${{ if eq(parameters.target, 'destroy') }}:
         - template: terraform/destroy.yml@templates
+

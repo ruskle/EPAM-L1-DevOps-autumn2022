@@ -2,12 +2,12 @@
 parameters:
 - name: default_var
   type: string 
-  default: "$(System.DefaultWorkingDirectory)/variables/default.tfvars"
+  default: '$(System.DefaultWorkingDirectory)/variables/default.tfvars'
 - name: backend_var
   type: string 
-  default: "$(System.DefaultWorkingDirectory)/variables/backend.tf"
+  default: '$(System.DefaultWorkingDirectory)/variables/backend.tf'
 
-steps:
+steps:  
 - task: Terraform@2
   displayName: 'Terraform init'
   inputs:

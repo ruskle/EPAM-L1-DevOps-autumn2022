@@ -15,7 +15,13 @@ parameters:
   values:
     - 'apply'
     - 'destroy'
-
+- name: environment
+  type: string
+  default: 'dev'
+  values:
+    - 'dev'
+    - 'qa'
+    - 'prd'
 
 variables:
 - name: artifact_name
@@ -27,7 +33,6 @@ resources:
    - repository: templates
      type: git
      name: Epam-final-project/yaml-templates
-     ref: artifact_task_change
 
 # Create pipeline stages
 stages:
@@ -36,4 +41,5 @@ stages:
     artifact_version: ${{ parameters.artifact_version }}
     artifact_name: ${{ variables.artifact_name }}
     target: ${{ parameters.target }}
+    environment: ${{ parameters.environment }}
 

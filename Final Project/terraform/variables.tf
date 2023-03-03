@@ -27,6 +27,12 @@ variable "vm_password" {
     description = "vm password"
 }
 
+variable "tenant_id" {
+    type = string
+    default = "f471ca54-cd7b-4c59-82cd-0caf5631aee7"
+    description = "id of tennant"
+}
+
 variable "aa_sku_name" {
     default = "Free"
     type = string
@@ -79,4 +85,25 @@ variable "shared_image" {
     default = "/subscriptions/3b789e5a-d874-493c-926e-c49708d38c82/resourceGroups/rg-epam-com-westeurope/providers/Microsoft.Compute/galleries/gal_epam_com_westeurope/images/ubuntu-20.04-build-agent/versions/0.25579.15020"
     type = string
     description = "shared_image"
+}
+
+variable "app_key" {
+    type = string
+    description = "app_key"
+}
+
+variable "app_id" {
+    type = string
+    description = "app_id"
+}
+
+variable "rg_name" {
+    type = string
+    description = "resource group name"
+}
+
+variable "prefix" {
+    default = "epam"
+    type = string
+    description = "prefix"
 }

@@ -24,7 +24,6 @@ resources:
     - repository: templates
       type: git
       name: Epam-final-project/yaml-templates
-      ref: artifact_task_change
 
 # Create pipeline stages
 stages:

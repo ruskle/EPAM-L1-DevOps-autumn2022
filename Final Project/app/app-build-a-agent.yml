@@ -27,7 +27,7 @@ resources:
 stages:
   - stage: release
     displayName: Release
-    pool: "vmss-test-pool"
+    pool: "vmss-epam-dev-westeurope-pool"
     jobs:
     - job: build
       displayName: build
